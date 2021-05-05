@@ -29,13 +29,13 @@ def get_list_values(dict):
 # code for streamlit web app
 st.title("Restaurant Suggester")
 with st.form(key='my_form'):
-    location = st.text_input(label='(MUST ENTER)Enter Location: ').strip()
-    cuisine = st.text_input(label='Enter Cuisine: ').strip()
-    budget_param = st.text_input(label='Enter price(1 is cheapest, 4 is most expensive): ').strip()
-    open_param = st.text_input(label='Enter yes or no for open now: ').strip()
-    radius = st.text_input(label='Search within x meters: ').strip()
-    sort_byinput = st.text_input(label='Enter 1: best match, 2: rating, 3: review count, 4: distance: ').strip()
-    stops_input = st.text_input(label='(MUST ENTER)How many restaurants to go to: ').strip()
+    location = st.text_input(label='Enter Location(Ex: philadelphia) (MUST ENTER): ').strip()
+    cuisine = st.text_input(label='Enter Cuisine(skip to use default): ').strip()
+    budget_param = st.text_input(label='Enter price(1 is cheapest, 4 is most expensive)(skip to use default): ').strip()
+    open_param = st.text_input(label='Enter yes or no for open now(skip to use default): ').strip()
+    radius = st.text_input(label='Search within x meters(skip to use default): ').strip()
+    sort_byinput = st.text_input(label='Enter 1: best match, 2: rating, 3: review count, 4: distance(skip to use default): ').strip()
+    stops_input = st.text_input(label='How many restaurants to go to(MUST ENTER) (MAX AMOUNT IS 10): ').strip()
     submit_button = st.form_submit_button(label='Submit')
 # set budget
 if budget_param == '1':
@@ -98,7 +98,6 @@ print(req.status_code)
 
 if req.status_code == 200:
     # set stops
-    stops = int(stops_input)
     st.header("List of Restaurants")
     data = json.loads(req.text)
     businesses = data['businesses']
@@ -110,9 +109,9 @@ if req.status_code == 200:
         st.write("Address:", " ".join(business["location"]["display_address"]), "\n")
         counter += 1
     
-
+    stops = int(stops_input)
     st.header("Restaurant Stop Order:")
-    with st.spinner("Running Graph Algorithm"):
+    with st.spinner("Running Graph Algorithm. DON'T CHANGE INPUTS"):
     # dictionary with all the latitude/longitude of restaurants
     # use for graphing algorithm
         coordinates = {}

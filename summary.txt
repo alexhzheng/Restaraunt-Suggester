@@ -1,0 +1,12 @@
+NETS 150 HW 5
+Project: Restaurant Suggester
+Group: Alexander Zheng and Jash Kakadia
+Link to project: https://share.streamlit.io/alexhzheng/restaraunt-suggester/main.py
+Project will be removed after 7 days of inactivity.
+We used the Yelp API to suggest restaurants based on user inputs. The user inputs location, cuisine, price, open_now, radius, sort_by, and number of restaurants parameters, and location must be entered or else it is not possible to search for restaurants. Cuisine is the type of food the user is interested in (Ex: Chinese), and price is a rating from $ to $$$$ where $ is 1 and $$$$ is 4. Users can input any number to limit price range.  Open now is whether or not the restaurant is open now or closed, so that users can choose to filter out closed restaurants. The radius limits how far out to check for restaurants, and the number of restaurants parameter determines the number of outputs. We can also sort the restaurants by best match, rating, review count, or distance. We implemented our project in Python instead of Java because working with the Yelp API was much easier in Python. We used streamlit framework to make a web app so users who don't know python can also use our program.
+
+The categories we used:
+Graph and graph algorithms: We represented vertices as restaurants (and the starting location) and edge weights as the time it would take to travel between these points. Then we implemented a Dijkstra’s algorithm to find shortest paths between the current location and all other locations, and suggested a restaurant.
+Document Search/Information Retrieval: We searched the Yelp API for restaurants that fit the given parameters. We also used the Google API to find travel times that we used as edge weights. Using webscraping will result in bans, so we felt APIs were a safer route.
+
+Both group members believe the work distribution was equal. Alexander did a majority of the scraping from the APIs, while Jash implemented the graph and graph algorithms into Python. Alexander also did the user inputs and dictionary creation while Jash ran the algorithm and appropriately handled the outputs.
