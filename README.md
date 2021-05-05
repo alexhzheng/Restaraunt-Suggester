@@ -6,3 +6,5 @@ Cuisine is type of food user is interested in (Ex: Chinese)
 Price is a rating from $ to $$$$ where $ is 1 and $$$$ is 4. Users can input any number to limit price range.  
 Open now is whether or not the restaurant is open now or closed. Users can choose to filter out closed restaurants.  
 Radius limits how far out to check for restaurants.  
+Sort_by lists the restaurant based on what the user prefers: best match, rating, review_count, distance, or default.
+
