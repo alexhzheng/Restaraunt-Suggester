@@ -1,5 +1,5 @@
 # Restaurant Suggester
-[web app] https://share.streamlit.io/alexhzheng/restaraunt-suggester/main.py 
+[web app] https://share.streamlit.io/alexhzheng/restaraunt-suggester/main.py     
 We use Yelp API to suggest restaurants based on user inputs.  
 User inputs location, cuisine, price, open_now, radius, and sort_by parameters.  
 Location must be entered or else not possible to search for restaurants.  
