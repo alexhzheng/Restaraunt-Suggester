@@ -104,86 +104,99 @@ if req.status_code == 200:
     counter = 0
 
     # prints out name and address of each restaurant
-    for business in businesses:
-        st.write(str(counter)+": Name:", business['name'])
-        st.write("Address:", " ".join(business["location"]["display_address"]), "\n")
-        counter += 1
-    
-    stops = int(stops_input)
-    st.header("Restaurant Stop Order:")
-    with st.spinner("Running Graph Algorithm. DON'T CHANGE INPUTS"):
-    # dictionary with all the latitude/longitude of restaurants
-    # use for graphing algorithm
-        coordinates = {}
-        region = data['region']
-        coordinates['Starting Location'] = region['center']
+    if len(businesses) == 0:
+        st.error("No Restaurants Found")
+    else:
         for business in businesses:
-            coordinates[business['name']] = business['coordinates']
+            st.write(str(counter)+": Name:", business['name'])
+            st.write("Address:", " ".join(business["location"]["display_address"]), "\n")
+            counter += 1
+        
+        stops = int(stops_input)
+        st.header("Restaurant Stop Order:")
+        st.write("Progress Bar")
+        graph_progress_bar = st.progress(0)
+        with st.spinner("Running Graph Algorithm. DON'T CHANGE INPUTS"):
+        # dictionary with all the latitude/longitude of restaurants
+        # use for graphing algorithm
+            coordinates = {}
+            region = data['region']
+            coordinates['Starting Location'] = region['center']
+            for business in businesses:
+                coordinates[business['name']] = business['coordinates']
 
-        # key-value pair test
-        # for k,v in coordinates.items():
-        #     print("name:", k)
-        #     print("coordinates", v)
-        #     print()
+            # key-value pair test
+            # for k,v in coordinates.items():
+            #     print("name:", k)
+            #     print("coordinates", v)
+            #     print()
 
-        # getting distances between every restaurants
-        size_of_list = len(coordinates)
-        names_list = get_list_keys(coordinates)
-        coordinates_list = get_list_values(coordinates)
-        distances = {}
-        for i in range(size_of_list):
-            source = str(coordinates_list[i]['latitude']) + ',' + str(coordinates_list[i]['longitude'])
-            distances[names_list[i]] = {}
-            for j in range(size_of_list):
-                if i != j:
-                    dest = str(coordinates_list[j]['latitude']) + ',' + str(coordinates_list[j]['longitude'])
-                    r = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?' + 'origins=' + str(source) +
-                                    '&destinations=' + str(dest) +
-                                    '&key=' + google_api_key)
-                    x = r.json()
-                    time_number = x['rows'][0]['elements'][0]['duration']['text'][0]
-                    distances[names_list[i]][names_list[j]] = time_number
+            # getting distances between every restaurants
+            size_of_list = len(coordinates)
+            names_list = get_list_keys(coordinates)
+            coordinates_list = get_list_values(coordinates)
+            distances = {}
+            counter = 0
+            for i in range(size_of_list):
+                source = str(coordinates_list[i]['latitude']) + ',' + str(coordinates_list[i]['longitude'])
+                distances[names_list[i]] = {}
+                for j in range(size_of_list):
+                    if i != j:
+                        dest = str(coordinates_list[j]['latitude']) + ',' + str(coordinates_list[j]['longitude'])
+                        r = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?' + 'origins=' + str(source) +
+                                        '&destinations=' + str(dest) +
+                                        '&key=' + google_api_key)
+                        x = r.json()
+                        time_number = x['rows'][0]['elements'][0]['duration']['text'][0]
+                        distances[names_list[i]][names_list[j]] = time_number
 
+                    else:
+                        distances[names_list[i]][names_list[j]] = 0
+                counter += 1/size_of_list * 0.33
+                graph_progress_bar.progress(counter)
+
+        # key-value pair test for distances
+        # for k,v in distances.items():
+        #     print("\nStart:", k)
+        #     for key in v:
+        #         print(key + ":", v[key])
+            # create graph
+            graph = Graph(len(names_list))
+            for x in range(len(names_list)): 
+                for y in range(len(names_list)):
+                    if not x == y:
+                        graph.addEdge(x, y, distances[names_list[x]][names_list[y]])
+
+                counter += 1/len(names_list) * 0.33
+                graph_progress_bar.progress(counter)
+            #create dijkstra
+            dijkstra = Dijkstra()
+
+            #desired number of restaurants (NEED TO IMPLEMENT ASKING USER FOR NUMBER)--using 5 for test
+
+
+            currentStartingLocation = 0
+
+            visited = []
+            visited.append(currentStartingLocation)
+            for x in range(min(stops, len(businesses))):
+                shortestList = []
+                for y in range(graph.getSize()) :
+                    shortestList.append(dijkstra.shortestPath(graph, currentStartingLocation, y)[1])
+                for z in visited:
+                    shortestList[z] = 100000000
+                closest = min(shortestList)
+                indexOfClosest = shortestList.index(closest)
+                if x == 0:
+                    st.write("First stop: " + names_list[indexOfClosest])
                 else:
-                    distances[names_list[i]][names_list[j]] = 0
-
-
-    # key-value pair test for distances
-    # for k,v in distances.items():
-    #     print("\nStart:", k)
-    #     for key in v:
-    #         print(key + ":", v[key])
-        # create graph
-        graph = Graph(len(names_list))
-        for x in range(len(names_list)): 
-            for y in range(len(names_list)):
-                if not x == y:
-                    graph.addEdge(x, y, distances[names_list[x]][names_list[y]])
-
-        #create dijkstra
-        dijkstra = Dijkstra()
-
-        #desired number of restaurants (NEED TO IMPLEMENT ASKING USER FOR NUMBER)--using 5 for test
-
-
-        currentStartingLocation = 0
-
-        visited = []
-        visited.append(currentStartingLocation)
-        for x in range(stops) :
-            shortestList = []
-            for y in range(graph.getSize()) :
-                shortestList.append(dijkstra.shortestPath(graph, currentStartingLocation, y)[1])
-            for z in visited:
-                shortestList[z] = 100000000
-            closest = min(shortestList)
-            indexOfClosest = shortestList.index(closest)
-            if x == 0:
-                st.write("First stop: " + names_list[indexOfClosest])
-            else:
-                st.write("Next stop: " + names_list[indexOfClosest])
-            currentStartingLocation = indexOfClosest
-            visited.append(indexOfClosest)
+                    st.write("Next stop: " + names_list[indexOfClosest])
+                currentStartingLocation = indexOfClosest
+                visited.append(indexOfClosest)
+                counter += 1/(min(stops, len(businesses))) * 0.33
+                graph_progress_bar.progress(min(counter, 1))
+            graph_progress_bar.progress(1.0)
+            st.balloons()
 
 else: 
     st.warning('Some inputs are wrong. Try Again.')
